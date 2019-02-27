@@ -5,8 +5,8 @@ plugins {
 }
 
 pluginBundle {
-    website = 'https://github.com/bst-services/weave-dependencies'
-    vcsUrl = 'https://github.com/bst-services/weave-dependencies'
+    website = 'https://github.com/bstservices/weave-dependencies'
+    vcsUrl = 'https://github.com/bstservices/weave-dependencies'
     tags = ['aspectj', 'weaving']
 }
 
@@ -17,7 +17,7 @@ gradlePlugin {
             displayName = 'AspectJ dependency weaving plugin'
             description = 'For weaving binary aspects into binary dependencies'
             implementationClass = 'services.bst.gradle.WeaveDependenciesPlugin'
-            version = '0.1.0'
+            version = '0.1.1'
         }
     }
 }
