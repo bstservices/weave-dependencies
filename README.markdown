@@ -9,7 +9,7 @@ You can add this plugin to your project by adding it to your plugins block:
 
 ```groovy
 plugins {
-    id "services.bst.weave-dependencies" version "0.1.0"
+    id "services.bst.weave-dependencies" version "0.1.2"
 }
 ```
 

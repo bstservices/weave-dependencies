@@ -17,7 +17,7 @@ gradlePlugin {
             displayName = 'AspectJ dependency weaving plugin'
             description = 'For weaving binary aspects into binary dependencies'
             implementationClass = 'services.bst.gradle.WeaveDependenciesPlugin'
-            version = '0.1.1'
+            version = '0.1.2'
         }
     }
 }

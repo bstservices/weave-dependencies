@@ -62,6 +62,11 @@ class WeaveDependenciesTask extends DefaultTask
 
     @TaskAction
     def weave() {
+        // Don't do anything if there's nothing to weave.
+        if (dependenciesToWeave.isEmpty()) {
+            return
+        }
+
         // Clear the output directory.
         new File(outDir).traverse {
             it.delete()
