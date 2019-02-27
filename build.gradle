@@ -1,0 +1,30 @@
+plugins {
+    id 'groovy'
+    id 'java-gradle-plugin' 
+    id 'com.gradle.plugin-publish' version '0.10.0' 
+}
+
+pluginBundle {
+    website = 'https://github.com/bst-services/weave-dependencies'
+    vcsUrl = 'https://github.com/bst-services/weave-dependencies'
+    tags = ['aspectj', 'weaving']
+}
+
+gradlePlugin {
+    plugins {
+        weaveDependenciesPlugin {
+            id = 'services.bst.weave-dependencies'
+            displayName = 'AspectJ dependency weaving plugin'
+            description = 'For weaving binary aspects into binary dependencies'
+            implementationClass = 'services.bst.gradle.WeaveDependenciesPlugin'
+            version = '0.1.0'
+        }
+    }
+}
+
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+}
+
