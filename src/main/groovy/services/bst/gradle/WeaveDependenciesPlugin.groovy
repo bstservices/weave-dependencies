@@ -2,8 +2,14 @@ package services.bst.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.DependencyResolutionListener
 import org.gradle.api.artifacts.ResolvableDependencies
+import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.tasks.SourceSet
+
+import java.util.Set
 
 class WeaveDependenciesPlugin implements Plugin<Project> {
     @Override
@@ -16,8 +22,8 @@ class WeaveDependenciesPlugin implements Plugin<Project> {
         def aspects = project.configurations.create('aspects')
         def weave = project.configurations.create('weave')
         project.configurations.getByName('compile').extendsFrom(
-            aspects,
             weave,
+            aspects,
         )
         ajc.dependencies.add(
             project.dependencies.add(
@@ -47,25 +53,49 @@ class WeaveDependenciesPlugin implements Plugin<Project> {
             task.ajcXlint = extension.ajcXlint
         }
 
+        project.afterEvaluate {
+            def preweaveDeps = getDirectPaths(weave)
+
+            project.sourceSets.each { SourceSet sourceSet ->
+                sourceSet.runtimeClasspath = sourceSet.runtimeClasspath.filter {
+                    !preweaveDeps.contains(it.absolutePath)
+                }
+            }
+        }
+
         // Insert the woven JARs as runtime dependencies after all other
         // dependencies have been added.
         project.getGradle().addListener(new DependencyResolutionListener() {
+            private def weavedDepsAdded = false
             @Override
             void beforeResolve(ResolvableDependencies resolvableDependencies) {
-                def runtimeDeps = project.getConfigurations().getByName("runtimeOnly").getDependencies()
-                def weaveOutputDir = project.tasks.findByName('weaveDependencies').outputs.files.singleFile
-                runtimeDeps.add(project.getDependencies().add(
-                    'runtimeOnly',
-                    project.fileTree(weaveOutputDir) {
-                        include '*.jar'
-                        builtBy task
-                    }
-                ))
-                project.getGradle().removeListener(this)
+                if (!weavedDepsAdded) {
+                    def runtimeOnly = project.getConfigurations().getByName("runtimeOnly").getDependencies()
+                    def weaveOutputDir = project.tasks.findByName('weaveDependencies').outputs.files.singleFile
+
+                    runtimeOnly.add(project.getDependencies().add(
+                        'runtimeOnly',
+                        project.fileTree(weaveOutputDir) {
+                            include '*.jar'
+                            builtBy task
+                        }
+                    ))
+                    weavedDepsAdded = true
+                }
             }
 
             @Override
             void afterResolve(ResolvableDependencies resolvableDependencies) {}
         })
+    }
+
+    private Set<String> getDirectPaths(Configuration config) {
+        Set<String> depSet = [] as Set
+        config.resolvedConfiguration.firstLevelModuleDependencies.each { ResolvedDependency topDependency ->
+            topDependency.moduleArtifacts.each { ResolvedArtifact artifact ->
+                depSet.add(artifact.file.absolutePath)
+            }
+        }
+        return depSet
     }
 }
