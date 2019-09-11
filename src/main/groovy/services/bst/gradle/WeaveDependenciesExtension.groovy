@@ -16,6 +16,10 @@ class WeaveDependenciesExtension {
      * The xlint value for Ajc
      */
     String ajcXlint = "ignore"
+    /**
+     * The xlintFile value for Ajc
+     */
+    String ajcXlintFile = null
 
     String getAspectJVersion() {
         return aspectJVersion
@@ -27,5 +31,9 @@ class WeaveDependenciesExtension {
 
     String getAjcXlint() {
         return ajcXlint
+    }
+
+    String getAjcXlintFile() {
+        return ajcXlintFile
     }
 }

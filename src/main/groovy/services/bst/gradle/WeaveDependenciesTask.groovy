@@ -57,6 +57,11 @@ class WeaveDependenciesTask extends DefaultTask
      */
     public String ajcXlint = "ignore"
 
+    /**
+     * The xlintFile value for ajc
+     */
+    public String ajcXlintFile = null
+
     @OutputDirectory
     final String outDir = "${project.buildDir}/weaved-libs/${name}"
 
@@ -137,14 +142,21 @@ class WeaveDependenciesTask extends DefaultTask
             if (it.file.exists() && it.file.name.endsWith('.jar')) {
                 def uniqueName =
                     "${escapeArtifactName(it.id.displayName)}.jar"
-                ant.iajc(
-                    fork: false,
-                    aspectPath: existingCpJarsPath,
-                    classpath: existingCpJarsPath,
-                    xlint: ajcXlint,
-                    inpath: it.file,
-                    outjar: "$outDir/$uniqueName",
-                ) {
+                def args = (
+                    [
+                        fork: false,
+                        aspectPath: existingCpJarsPath,
+                        classpath: existingCpJarsPath,
+                        xlint: ajcXlint,
+                        inpath: it.file,
+                        outjar: "$outDir/$uniqueName"
+                    ] + (
+                        ajcXlintFile == null
+                            ? []
+                            : [xlintFile: ajcXlintFile]
+                    )
+                ) 
+                ant.iajc(args) {
                     inxml {
                         path {
                             aopFileNames.each {

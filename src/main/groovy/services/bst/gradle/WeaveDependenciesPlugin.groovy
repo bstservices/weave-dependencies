@@ -51,6 +51,7 @@ class WeaveDependenciesPlugin implements Plugin<Project> {
             task.ajc = ajc
             task.classesToExclude = extension.classesToExclude
             task.ajcXlint = extension.ajcXlint
+            task.ajcXlintFile = extension.ajcXlintFile
         }
 
         project.afterEvaluate {
